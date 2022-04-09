@@ -1,9 +1,6 @@
 from wordcloud import WordCloud, STOPWORDS
-from PIL import Image
 import matplotlib.pyplot as plt
 import pandas as pd
-import numpy as np
-
 from dateutil import parser
 from datetime import datetime
 import plotly.express as px
