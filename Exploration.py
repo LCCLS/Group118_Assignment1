@@ -2,6 +2,8 @@ from matplotlib import pyplot as plt
 import pandas as pd
 import numpy as np
 from dateutil import parser
+from datetime import datetime
+import plotly.express as px
 
 
 class Data_Exploration:
@@ -11,31 +13,77 @@ class Data_Exploration:
         # class vars
 
         self.df = pd.DataFrame(pd.read_csv(filename, delimiter=";"))
-        self.ODI = []
-        self.ODI_frequencies = {}
-        self.questions = []
-        self.all_responses = []
+        self.questions = self.df.columns.values.tolist()
+        self.linked_questions = {}
 
         # clean data
 
         self.column_names()
         self.preprocessing_birthdate()
         self.preprocessing_competition_reward()
-        self.preprocessing_programme()
+        self.preprocessing_program()
         self.preprocessing_good_day_stress_ns()
+        self.preprocessing_bed_time_yesterday()
+
+        # plot data
+
+        # self.pie_plotting('program')
+        # self.pie_plotting('course_on_ML')
+        # self.pie_plotting('course_on_IR')
+        # self.pie_plotting('course_on_stat')
+        # self.pie_plotting('course_on_databases')
+        # self.pie_plotting('gender')
+        # self.pie_plotting('chocolate_makes_you')
+
+        # self.hist_plotting('nr_neighbor')
+        # self.hist_plotting('birthday')
+        # self.hist_plotting('bed_time_yesterday')
 
     def column_names(self):
         """
-        changes the lengthy column names to shorter versions.
-
+        changes the lengthy column names to shorter versions. also updates self.linked_questions which maps new column
+        names to the original questions
+e
         :return: a dataframe with updated column names
         """
+
         column_names = ['timestamp', 'program', 'course_on_ML', 'course_on_IR', 'course_on_stat', 'course_on_databases',
                         'gender', 'chocolate_makes_you', 'birthday', 'nr_neighbor', 'stand_up', 'stress_lev',
                         'competition reward', 'rand_num', 'bed_time_yesterday', 'good_day1', 'good_day2']
 
+        self.linked_questions = {column_names[i]: self.questions[i] for i in range(len(column_names))}
+
         for name in enumerate(self.df.columns):
             self.df.rename(columns={self.df.columns[name[0]]: column_names[name[0]]}, inplace=True)
+
+    def preprocessing_bed_time_yesterday(self):
+
+        for time in self.df['bed_time_yesterday']:
+
+            if type(time) != str or not any(char.isdigit() for char in time) or \
+                    len([x for x in time if x.isalpha()]) > 2:
+                self.df['bed_time_yesterday'] = self.df['bed_time_yesterday'].replace(time, np.nan)
+
+            else:
+                new_time = time.strip().replace('.', ':').upper()
+                if len(new_time) == 1:
+                    new_time = f'0{new_time}:00'
+                elif len(new_time) == 2:
+                    new_time += ':00'
+                if new_time[:2].isnumeric() and time.startswith('1') and int(new_time[:2]) < 13:
+                    new_time = str(int(new_time[:2]) + 12) + str(new_time[2:])
+
+                try:
+                    parts = parser.parse(new_time, ignoretz=True)
+                    processed_time = datetime.strftime(parts, '%H:%M:%S')
+                    self.df['bed_time_yesterday'] = self.df['bed_time_yesterday'].replace(to_replace=time,
+                                                                                          value=processed_time)
+
+                except ValueError:
+                    self.df['bed_time_yesterday'] = self.df['bed_time_yesterday'].replace(time, np.nan)
+
+        for i in self.df['bed_time_yesterday']:
+            print(i)
 
     def preprocessing_birthdate(self):
         """
@@ -45,17 +93,17 @@ class Data_Exploration:
         """
 
         for birthdate in self.df['birthday']:
-            if 8 <= len(birthdate) < 12 and birthdate != 'NaN':
+            if 8 <= len(birthdate) < 12 and birthdate != np.nan:
                 try:
                     if 1950 < parser.parse(birthdate).year < 2022:
                         self.df['birthday'] = self.df['birthday'].replace(to_replace=birthdate,
                                                                           value=parser.parse(birthdate))
                     else:
-                        self.df['birthday'] = self.df['birthday'].replace(birthdate, 'NaN')
+                        self.df['birthday'] = self.df['birthday'].replace(birthdate, np.nan)
                 except ValueError:
-                    self.df['birthday'] = self.df['birthday'].replace(birthdate, 'NaN')
+                    self.df['birthday'] = self.df['birthday'].replace(birthdate, np.nan)
             else:
-                self.df['birthday'] = self.df['birthday'].replace(birthdate, 'NaN')
+                self.df['birthday'] = self.df['birthday'].replace(birthdate, np.nan)
 
     def preprocessing_competition_reward(self):
         """
@@ -67,9 +115,10 @@ class Data_Exploration:
 
         for response in self.df['competition reward']:
             if type(response) != str or not response.isnumeric() or not 0 < int(response) < 101:
-                self.df['competition reward'] = self.df['competition reward'].replace(response, 'NaN')
+                self.df['competition reward'] = self.df['competition reward'].replace(response, np.nan)
 
-    def preprocessing_programme(self):
+    def preprocessing_program(self):
+        # this needs to be updated a bit :)
         """
         preprocesses the programme column and normalizes the names to standards. if the programme count is less than 3,
         the programme is counted to the "others" categorisation
@@ -99,9 +148,9 @@ class Data_Exploration:
         for col in to_be_cleaned:
             for x in self.df[col]:
                 if x in affirm:
-                    self.df[col] = self.df[col].replace(x, 1)
+                    self.df[col] = self.df[col].replace(x, 'yes')
                 elif x in deny:
-                    self.df[col] = self.df[col].replace(x, 0)
+                    self.df[col] = self.df[col].replace(x, 'no')
 
     def preprocessing_good_day_stress_ns(self):
         """
@@ -125,37 +174,35 @@ class Data_Exploration:
                 if x.isnumeric():
                     self.df[col] = self.df[col].replace(x, np.nan)
 
-    # def response_mapping(self):
-    #
-    #    self.questions = self.ODI[0]
-    #    self.all_responses = self.ODI[1:]
-    #    self.ODI_frequencies = {self.questions[i]: {} for i in range(len(self.questions))}
-    #
-    #    for student in self.all_responses:
-    #        for response in enumerate(student):
-    #
-    #            resp = response[1]
-    #            index = response[0]
-    #
-    #            if resp not in self.ODI_frequencies[self.questions[index]]:
-    #                self.ODI_frequencies[self.questions[index]][resp] = 1
-    #
-    #            elif resp in self.ODI_frequencies[self.questions[index]].keys():
-    #                self.ODI_frequencies[self.questions[index]][resp] += 1
+    def pie_plotting(self, column_name):
+        """
+        takes a column name of the df and creates a plotly pie chart
+        :param column_name: the column name of the pd dataframe
+        :return: pie chart
+        """
 
-    def plot(self, dict_key: str):
+        df_val = [i for i in self.df[f'{column_name}'].value_counts()]
+        df_names = self.df[f'{column_name}'].value_counts().index.to_list()
 
-        # currently only a barchart with faulty x axis categorisation
+        fig = px.pie(self.df, values=df_val, names=df_names, title=self.linked_questions[f'{column_name}'])
+        fig.update_traces(textposition='inside', textinfo='percent+label')
+        fig.show()
 
-        plt.rcParams["figure.figsize"] = [7.50, 3.50]
-        plt.rcParams["figure.autolayout"] = True
+    def hist_plotting(self, column_name):
+        """
+        takes a column name of the df and creates a plotly histogram
+        :param column_name: the column name of the processed pd dataframe
+        :return: histogram
+        """
 
-        fig, ax = plt.subplots()
+        # the sorting of the values still needs to be changed cause theyre messed up in nr of neighbors
 
-        df = pd.DataFrame({dict_key: self.ODI_frequencies[dict_key]})
-        df[dict_key].value_counts().plot(ax=ax, kind='bar', xlabel=f'{dict_key}', ylabel='frequency')
+        df_val = [i for i in self.df[f'{column_name}'].value_counts()]
+        df_names = self.df[f'{column_name}'].value_counts().index.to_list()
 
-        plt.show()
+        fig = px.histogram(self.df, x=df_names, y=df_val, title=self.linked_questions[f'{column_name}'])
+        fig.update_layout(bargap=0.2)
+        fig.show()
 
 
 document_name = "data/ODI-2022.csv"
