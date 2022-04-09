@@ -82,9 +82,6 @@ e
                 except ValueError:
                     self.df['bed_time_yesterday'] = self.df['bed_time_yesterday'].replace(time, np.nan)
 
-        for i in self.df['bed_time_yesterday']:
-            print(i)
-
     def preprocessing_birthdate(self):
         """
         preprocesses the birthdate column. All values are omitted that do not contain DD,MM,YY in some format
