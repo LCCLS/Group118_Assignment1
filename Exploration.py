@@ -43,7 +43,7 @@ class Data_Exploration:
         """
         changes the lengthy column names to shorter versions. also updates self.linked_questions which maps new column
         names to the original questions
-e
+
         :return: a dataframe with updated column names
         """
 
