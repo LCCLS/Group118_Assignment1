@@ -42,7 +42,7 @@ class Data_Exploration:
 
         # word clouds
 
-        self.wordcloud('good_day1', second_column='good_day2')
+        # self.wordcloud('good_day1', second_column='good_day2')
 
     def column_names(self):
         """
@@ -177,6 +177,8 @@ class Data_Exploration:
                 if x.isnumeric():
                     self.df[col] = self.df[col].replace(x, 'NaN')
 
+
+
     def pie_plotting(self, column_name):
         """
         takes a column name of the df and creates a plotly pie chart
@@ -221,14 +223,21 @@ class Data_Exploration:
         """
 
         if second_column:
-            all_words = self.df[f'{column_name}'] + self.df[f'{second_column}']
+
+            all_words = []
+            for col in [f'{column_name}', f'{second_column}']:
+                for i in self.df[f'{col}']:
+                    all_words.append(i)
+
         else:
             all_words = self.df[f'{column_name}']
+
+        print(all_words)
 
         text = "\n".join(str(word).lower() for word in all_words)
 
         stopwords = set(STOPWORDS)
-        stopwords.update('nan', 'NaN', 'Nan', 'NAN')
+        stopwords.update(['nan', 'NaN', 'Nan', 'NAN'])
 
         wordcloud = WordCloud(width=1000, height=600,
                               background_color='black',
