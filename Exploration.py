@@ -1,7 +1,9 @@
 from wordcloud import WordCloud, STOPWORDS
+from PIL import Image
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+
 from dateutil import parser
 from datetime import datetime
 import plotly.express as px
@@ -28,21 +30,21 @@ class Data_Exploration:
 
         # plot data
 
-        # self.pie_plotting('program')
-        # self.pie_plotting('course_on_ML')
-        # self.pie_plotting('course_on_IR')
-        # self.pie_plotting('course_on_stat')
-        # self.pie_plotting('course_on_databases')
-        # self.pie_plotting('gender')
-        # self.pie_plotting('chocolate_makes_you')
+        self.pie_plotting('program')
+        self.pie_plotting('course_on_ML')
+        self.pie_plotting('course_on_IR')
+        self.pie_plotting('course_on_stat')
+        self.pie_plotting('course_on_databases')
+        self.pie_plotting('gender')
+        self.pie_plotting('chocolate_makes_you')
 
-        # self.hist_plotting('nr_neighbor')
-        # self.hist_plotting('birthday')
-        # self.hist_plotting('bed_time_yesterday')
+        self.hist_plotting('nr_neighbor')
+        self.hist_plotting('birthday')
+        self.hist_plotting('bed_time_yesterday')
 
         # word clouds
 
-        # self.wordcloud('good_day1', second_column='good_day2')
+        self.wordcloud('good_day1', second_column='good_day2')
 
     def column_names(self):
         """
@@ -177,13 +179,11 @@ class Data_Exploration:
                 if x.isnumeric():
                     self.df[col] = self.df[col].replace(x, 'NaN')
 
-
-
     def pie_plotting(self, column_name):
         """
         takes a column name of the df and creates a plotly pie chart
         :param column_name: the column name of the pd dataframe
-        :return: pie chart
+        :return: pie chart and saved file in "figures" directory
         """
 
         df_val = [i for i in self.df[f'{column_name}'].value_counts()]
@@ -191,13 +191,14 @@ class Data_Exploration:
 
         fig = px.pie(self.df, values=df_val, names=df_names, title=self.linked_questions[f'{column_name}'])
         fig.update_traces(textposition='inside', textinfo='percent+label')
-        fig.show()
+        fig.write_image(f"figures/{self.linked_questions[f'{column_name}']}.png")
+        # fig.show()
 
     def hist_plotting(self, column_name):
         """
         takes a column name of the df and creates a plotly histogram
         :param column_name: the column name of the processed pd dataframe
-        :return: histogram
+        :return: histogram and saved file in "figures" directory
         """
 
         # the sorting of the values still needs to be changed cause theyre messed up in nr of neighbors
@@ -207,7 +208,8 @@ class Data_Exploration:
 
         fig = px.histogram(self.df, x=df_names, y=df_val, title=self.linked_questions[f'{column_name}'])
         fig.update_layout(bargap=0.2)
-        fig.show()
+        fig.write_image(f"figures/{self.linked_questions[f'{column_name}']}.png")
+        # fig.show()
 
     def wordcloud(self, column_name, second_column=None):
 
@@ -219,7 +221,7 @@ class Data_Exploration:
         :param second_column: an additional parameter if a df column name is passed in, the method will concatenate the
                 two columns; normally set to default "None"
         :param column_name: df column name
-        :return: wordcloud
+        :return: wordcloud and saved file in "figures" directory
         """
 
         if second_column:
@@ -232,7 +234,7 @@ class Data_Exploration:
         else:
             all_words = self.df[f'{column_name}']
 
-        print(all_words)
+        # print(all_words)
 
         text = "\n".join(str(word).lower() for word in all_words)
 
@@ -248,7 +250,9 @@ class Data_Exploration:
         plt.imshow(wordcloud, interpolation='bilinear')
         plt.axis('off')
         plt.tight_layout(pad=2)
-        plt.show()
+        plt.title(self.linked_questions[f'{column_name}'])
+        plt.savefig(f"figures/{self.linked_questions[f'{column_name}']}")
+        # plt.show()
 
 
 document_name = "data/ODI-2022.csv"
