@@ -92,7 +92,7 @@ class Data_Exploration:
         for birthdate in self.df['birthday']:
             if 8 <= len(birthdate) < 12 and birthdate != np.nan:
                 try:
-                    if 1950 < parser.parse(birthdate).year < 2022:
+                    if 1960 < parser.parse(birthdate).year < 2007:
                         self.df['birthday'] = self.df['birthday'].replace(to_replace=birthdate,
                                                                           value=parser.parse(birthdate))
                     else:
