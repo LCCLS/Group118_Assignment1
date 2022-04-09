@@ -1,4 +1,5 @@
-from matplotlib import pyplot as plt
+from wordcloud import WordCloud, STOPWORDS
+import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from dateutil import parser
@@ -39,6 +40,10 @@ class Data_Exploration:
         # self.hist_plotting('birthday')
         # self.hist_plotting('bed_time_yesterday')
 
+        # word clouds
+
+        self.wordcloud('good_day1', second_column='good_day2')
+
     def column_names(self):
         """
         changes the lengthy column names to shorter versions. also updates self.linked_questions which maps new column
@@ -62,7 +67,7 @@ class Data_Exploration:
 
             if type(time) != str or not any(char.isdigit() for char in time) or \
                     len([x for x in time if x.isalpha()]) > 2:
-                self.df['bed_time_yesterday'] = self.df['bed_time_yesterday'].replace(time, np.nan)
+                self.df['bed_time_yesterday'] = self.df['bed_time_yesterday'].replace(time, 'NaN')
 
             else:
                 new_time = time.strip().replace('.', ':').upper()
@@ -80,7 +85,7 @@ class Data_Exploration:
                                                                                           value=processed_time)
 
                 except ValueError:
-                    self.df['bed_time_yesterday'] = self.df['bed_time_yesterday'].replace(time, np.nan)
+                    self.df['bed_time_yesterday'] = self.df['bed_time_yesterday'].replace(time, 'NaN')
 
     def preprocessing_birthdate(self):
         """
@@ -90,17 +95,17 @@ class Data_Exploration:
         """
 
         for birthdate in self.df['birthday']:
-            if 8 <= len(birthdate) < 12 and birthdate != np.nan:
+            if 8 <= len(birthdate) < 12 and birthdate != 'NaN':
                 try:
                     if 1960 < parser.parse(birthdate).year < 2007:
                         self.df['birthday'] = self.df['birthday'].replace(to_replace=birthdate,
                                                                           value=parser.parse(birthdate))
                     else:
-                        self.df['birthday'] = self.df['birthday'].replace(birthdate, np.nan)
+                        self.df['birthday'] = self.df['birthday'].replace(birthdate, 'NaN')
                 except ValueError:
-                    self.df['birthday'] = self.df['birthday'].replace(birthdate, np.nan)
+                    self.df['birthday'] = self.df['birthday'].replace(birthdate, 'NaN')
             else:
-                self.df['birthday'] = self.df['birthday'].replace(birthdate, np.nan)
+                self.df['birthday'] = self.df['birthday'].replace(birthdate, 'NaN')
 
     def preprocessing_competition_reward(self):
         """
@@ -112,7 +117,7 @@ class Data_Exploration:
 
         for response in self.df['competition reward']:
             if type(response) != str or not response.isnumeric() or not 0 < int(response) < 101:
-                self.df['competition reward'] = self.df['competition reward'].replace(response, np.nan)
+                self.df['competition reward'] = self.df['competition reward'].replace(response, 'NaN')
 
     def preprocessing_program(self):
         # this needs to be updated a bit :)
@@ -161,15 +166,16 @@ class Data_Exploration:
 
         clean_up = ["good_day1", "good_day2"]
 
-        self.df["stress_lev"] = [np.nan if (str(x).isnumeric() == False or int(x) > 100 or int(x) < 0) else x for x in
+        self.df["stress_lev"] = ['NaN' if (str(x).isnumeric() == False or int(x) > 100 or int(x) < 0) else x for x in
                                  self.df["stress_lev"]]
-        self.df["nr_neighbor"] = [np.nan if (str(x).isnumeric() == False or int(x) > 15 or int(x) < 0) else x for x in
+        self.df["nr_neighbor"] = ['NaN' if (str(x).isnumeric() == False or int(x) > 15 or int(x) < 0) else x for x in
                                   self.df["nr_neighbor"]]
 
         for col in clean_up:
             for x in self.df[col]:
+                x = str(x.lower())
                 if x.isnumeric():
-                    self.df[col] = self.df[col].replace(x, np.nan)
+                    self.df[col] = self.df[col].replace(x, 'NaN')
 
     def pie_plotting(self, column_name):
         """
@@ -200,6 +206,40 @@ class Data_Exploration:
         fig = px.histogram(self.df, x=df_names, y=df_val, title=self.linked_questions[f'{column_name}'])
         fig.update_layout(bargap=0.2)
         fig.show()
+
+    def wordcloud(self, column_name, second_column=None):
+
+        # this needs a bit of preprocessing. either we add stopwords manually, or we could use spacy for NLP
+        # tokenization.
+
+        """
+        takes a column name of the dataframe and plots a wordlcoud
+        :param second_column: an additional parameter if a df column name is passed in, the method will concatenate the
+                two columns; normally set to default "None"
+        :param column_name: df column name
+        :return: wordcloud
+        """
+
+        if second_column:
+            all_words = self.df[f'{column_name}'] + self.df[f'{second_column}']
+        else:
+            all_words = self.df[f'{column_name}']
+
+        text = "\n".join(str(word).lower() for word in all_words)
+
+        stopwords = set(STOPWORDS)
+        stopwords.update('nan', 'NaN', 'Nan', 'NAN')
+
+        wordcloud = WordCloud(width=1000, height=600,
+                              background_color='black',
+                              stopwords=stopwords,
+                              min_font_size=10).generate(text)
+
+        plt.figure(figsize=(10, 6), facecolor='black')
+        plt.imshow(wordcloud, interpolation='bilinear')
+        plt.axis('off')
+        plt.tight_layout(pad=2)
+        plt.show()
 
 
 document_name = "data/ODI-2022.csv"
