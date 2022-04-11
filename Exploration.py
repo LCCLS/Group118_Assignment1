@@ -1,9 +1,11 @@
 from wordcloud import WordCloud, STOPWORDS
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 from dateutil import parser
 from datetime import datetime
 import plotly.express as px
+import time
 
 
 class Data_Exploration:
@@ -35,9 +37,9 @@ class Data_Exploration:
         self.pie_plotting('gender')
         self.pie_plotting('chocolate_makes_you')
 
-        self.hist_plotting('nr_neighbor')
+        self.hist_plotting('number of neighbors')
         self.hist_plotting('birthday')
-        self.hist_plotting('bed_time_yesterday')
+        self.hist_plotting('bed time yesterday')
 
         # word clouds
 
@@ -52,8 +54,8 @@ class Data_Exploration:
         """
 
         column_names = ['timestamp', 'program', 'course_on_ML', 'course_on_IR', 'course_on_stat', 'course_on_databases',
-                        'gender', 'chocolate_makes_you', 'birthday', 'nr_neighbor', 'stand_up', 'stress_lev',
-                        'competition reward', 'rand_num', 'bed_time_yesterday', 'good_day1', 'good_day2']
+                        'gender', 'chocolate_makes_you', 'birthday', 'number of neighbors', 'stand up', 'stress_lev',
+                        'competition reward', 'rand_num', 'bed time yesterday', 'good_day1', 'good_day2']
 
         self.linked_questions = {column_names[i]: self.questions[i] for i in range(len(column_names))}
 
@@ -62,11 +64,11 @@ class Data_Exploration:
 
     def preprocessing_bed_time_yesterday(self):
 
-        for time in self.df['bed_time_yesterday']:
+        for time in self.df['bed time yesterday']:
 
             if type(time) != str or not any(char.isdigit() for char in time) or \
                     len([x for x in time if x.isalpha()]) > 2:
-                self.df['bed_time_yesterday'] = self.df['bed_time_yesterday'].replace(time, 'NaN')
+                self.df['bed time yesterday'] = self.df['bed time yesterday'].replace(time, np.nan)
 
             else:
                 new_time = time.strip().replace('.', ':').upper()
@@ -76,15 +78,19 @@ class Data_Exploration:
                     new_time += ':00'
                 if new_time[:2].isnumeric() and time.startswith('1') and int(new_time[:2]) < 13:
                     new_time = str(int(new_time[:2]) + 12) + str(new_time[2:])
+                if new_time[3:5] != '00':
+                    new_time = new_time[:3] + '00'
 
                 try:
                     parts = parser.parse(new_time, ignoretz=True)
                     processed_time = datetime.strftime(parts, '%H:%M:%S')
-                    self.df['bed_time_yesterday'] = self.df['bed_time_yesterday'].replace(to_replace=time,
+                    self.df['bed time yesterday'] = self.df['bed time yesterday'].replace(to_replace=time,
                                                                                           value=processed_time)
 
                 except ValueError:
-                    self.df['bed_time_yesterday'] = self.df['bed_time_yesterday'].replace(time, 'NaN')
+                    self.df['bed time yesterday'] = self.df['bed time yesterday'].replace(time, np.nan)
+
+    # df[df["age"] > 20]
 
     def preprocessing_birthdate(self):
         """
@@ -165,10 +171,10 @@ class Data_Exploration:
 
         clean_up = ["good_day1", "good_day2"]
 
-        self.df["stress_lev"] = ['NaN' if (str(x).isnumeric() == False or int(x) > 100 or int(x) < 0) else x for x in
+        self.df["stress_lev"] = [np.nan if (str(x).isnumeric() == False or int(x) > 100 or int(x) < 0) else x for x in
                                  self.df["stress_lev"]]
-        self.df["nr_neighbor"] = ['NaN' if (str(x).isnumeric() == False or int(x) > 15 or int(x) < 0) else x for x in
-                                  self.df["nr_neighbor"]]
+        self.df["number of neighbors"] = [np.nan if (str(x).isnumeric() == False or int(x) > 15 or int(x) < 0) else '9+'
+        if int(x) >= 9 else x for x in self.df["number of neighbors"]]
 
         for col in clean_up:
             for x in self.df[col]:
@@ -197,16 +203,23 @@ class Data_Exploration:
         :param column_name: the column name of the processed pd dataframe
         :return: histogram and saved file in "figures" directory
         """
+        # for i in self.df[f'{column_name}']:
+        #    print(i,type(i))
 
         # the sorting of the values still needs to be changed cause theyre messed up in nr of neighbors
 
-        df_val = [i for i in self.df[f'{column_name}'].value_counts()]
-        df_names = self.df[f'{column_name}'].value_counts().index.to_list()
+        df_freq = [i for i in self.df[f'{column_name}'].value_counts()]
+        df_val = self.df[f'{column_name}'].value_counts().index.to_list()
 
-        fig = px.histogram(self.df, x=df_names, y=df_val, title=self.linked_questions[f'{column_name}'])
+        df_combined = zip(df_freq, df_val)
+        df_combined = sorted(df_combined, key=lambda x: str(x[1:]))
+        df_frequencies, df_values = zip(*df_combined)
+
+        fig = px.histogram(self.df, x=df_values, y=df_frequencies, title=self.linked_questions[f'{column_name}'],
+                           labels=dict(x=f'{column_name}', y='frequency'))
         fig.update_layout(bargap=0.2)
         fig.write_image(f"figures/{self.linked_questions[f'{column_name}']}.png")
-        # fig.show()
+        fig.show()
 
     def wordcloud(self, column_name, second_column=None):
 
