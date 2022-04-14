@@ -1,6 +1,4 @@
 import pandas as pd
-import numpy as np
-import re
 
 
 class preprocessing:
@@ -28,20 +26,24 @@ class preprocessing:
 
             if occurrence == 1:
                 self.df['improve_yourself_how'] = self.df['improve_yourself_how'].replace(to_replace=answer,
-                                                                                          value=float(1.0))
+                                                                                          value=int(1))
             elif occurrence >= 2:
                 self.df['improve_yourself_how'] = self.df['improve_yourself_how'].replace(to_replace=answer,
-                                                                                          value=float(2.0))
+                                                                                          value=int(2))
             else:
                 self.df['improve_yourself_how'] = self.df['improve_yourself_how'].replace(to_replace=answer,
-                                                                                          value=float(0.0))
+                                                                                          value=int(0))
 
             self.df['improve_yourself_how'] = self.df['improve_yourself_how'].replace(to_replace=answer,
                                                                                       value=int(occurrence))
         self.df.rename(columns={'improve_yourself_how': 'number_of_self_improvements'}, inplace=True)
 
     def cleaning_yes_no(self, column_name):
-
+        """
+        cleans the column by converting categrocial data into binary
+        :param column_name: the column that should be processed
+        :return: binary values in the column and updates the df
+        """
         df_one = pd.get_dummies(self.df[column_name])
         df_one = df_one.drop(['No'], axis=1)
         df_one = df_one.rename(columns={"Yes": column_name})
@@ -50,7 +52,10 @@ class preprocessing:
         self.df = pd.concat((df_one, self.df), axis=1)
 
     def cleaning_income(self):
-
+        """
+        takes the income as a string
+        :return: return the max. income as an integer
+        """
         for i in self.df['income']:
             digits = ''.join(filter(lambda i: i.isdigit(), i[-6:]))
             self.df['income'] = self.df['income'].replace(to_replace=i, value=digits)
