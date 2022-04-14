@@ -57,8 +57,11 @@ class preprocessing:
         :return: return the max. income as an integer
         """
         for i in self.df['income']:
-            digits = ''.join(filter(lambda i: i.isdigit(), i[-6:]))
-            self.df['income'] = self.df['income'].replace(to_replace=i, value=digits)
+            digits = ''.join(filter(lambda i: i.isdigit(), i[-7:]))
+            if len(digits) != 0:
+                self.df['income'] = self.df['income'].replace(to_replace=i, value=float(digits))
+            else:
+                self.df['income'] = self.df['income'].replace(to_replace=i, value=float(200000))
 
 
 path = 'data/forever_alone.csv'
@@ -68,5 +71,7 @@ preprocessed_file.cleaning_yes_no('depressed')
 preprocessed_file.cleaning_yes_no('social_fear')
 preprocessed_file.cleaning_income()
 
-
 print(preprocessed_file.df.head())
+print(preprocessed_file.df.shape)
+print(preprocessed_file.df.isna().sum())
+print(preprocessed_file.df.dtypes)
