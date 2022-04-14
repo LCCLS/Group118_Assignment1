@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-class preprocessing:
+class PreProcessing:
 
     def __init__(self, filepath):
         self.df = self.reader(filepath)
@@ -81,6 +81,10 @@ class NeuralNet:
         self.y = None
 
     def set_init_weights(self):
+        """
+        sets the initial weights of each layer
+        :return: updates the self.parameter dictionary with all weights nd biases
+        """
         np.random.seed(1)
         self.params["W1"] = np.random.randn(self.layers[0], self.layers[1])
         self.params['b1'] = np.random.randn(self.layers[1], )
@@ -88,16 +92,37 @@ class NeuralNet:
         self.params['b2'] = np.random.randn(self.layers[2], )
 
     def relu(self, Z):
+        """
+        rectified linear activation function to return 0 if net input is below 0 and otherwise linear activation
+        :param Z: net input z of node
+        :return: the rectified linear activation
+        """
         return np.maximum(0, Z)
 
     def sigmoid(self, Z):
+        """
+        sigmoid output function for binary classification
+        :param Z: net input of node
+        :return: approximated output value of the output layer for each node
+        """
         return 1 / (1 + np.exp(-Z))
 
     def eta(self, x):
+        """
+        returning small value ETA to prevent the log of 0
+        :param x: y_hat
+        :return: either y_hat or the ETA value (whichever is bigger)
+        """
         ETA = 0.0000000001
         return np.maximum(x, ETA)
 
     def entropy_loss(self, y, yhat):
+        """
+        cross entropy loss function for updating weights
+        :param y: actual value y
+        :param yhat: predicted value y hat
+        :return: the loss of the current model compared to actual gold label
+        """
         nsample = len(y)
         yhat_inv = 1.0 - yhat
         y_inv = 1.0 - y
@@ -107,6 +132,10 @@ class NeuralNet:
         return loss
 
     def forward_propagation(self):
+        """
+        forward pass through the network
+        :return: the predicted value and the current loss of the model
+        """
         Z1 = self.X.dot(self.params['W1']) + self.params['b1']
         A1 = self.relu(Z1)
         Z2 = A1.dot(self.params['W2']) + self.params['b2']
@@ -121,6 +150,11 @@ class NeuralNet:
         return yhat, loss
 
     def dRelu(self, x):
+        """
+
+        :param x:
+        :return:
+        """
         x[x <= 0] = 0
         x[x > 0] = 1
         return x
@@ -149,19 +183,19 @@ class NeuralNet:
     def fit(self, X, y):
         self.X = X
         self.y = y
-        self.set_init_weights()  # initialize weights and bias
+        self.set_init_weights()
 
         for i in range(self.iterations):
-            yhat, loss = self.forward_propagation()
-            self.backpropagation(yhat)
+            y_hat, loss = self.forward_propagation()
+            self.backpropagation(y_hat)
             self.loss.append(loss)
 
     def predict(self, X):
         Z1 = X.dot(self.params['W1']) + self.params['b1']
         A1 = self.relu(Z1)
         Z2 = A1.dot(self.params['W2']) + self.params['b2']
-        pred = self.sigmoid(Z2)
-        return np.round(pred)
+        prediction = self.sigmoid(Z2)
+        return np.round(prediction)
 
     def acc(self, y, yhat):
         accuracy = int(np.sum(y == yhat) / len(y) * 100)
@@ -176,7 +210,7 @@ class NeuralNet:
 
 
 path = 'data/forever_alone.csv'
-preprocessed_file = preprocessing(path)
+preprocessed_file = PreProcessing(path)
 preprocessed_file.cleaning_improvement()
 preprocessed_file.cleaning_yes_no('depressed')
 preprocessed_file.cleaning_yes_no('social_fear')
@@ -212,15 +246,17 @@ Xtest = sc.transform(Xtest)
 
 # TRAINING THE NEURAL NET
 
-nn = NeuralNet(layers=[4,2,1], learning_rate=0.01, iterations=500)
+nn = NeuralNet(layers=[4, 2, 1], learning_rate=0.01, iterations=500)
 nn.fit(Xtrain, ytrain)
-# nn.plot_loss()
+#nn.plot_loss()
 
-train_pred = nn.predict(Xtrain)
-test_pred = nn.predict(Xtest)
+train_prediction = nn.predict(Xtrain)
+test_prediction = nn.predict(Xtest)
 
-training_accuracy = nn.acc(ytrain, train_pred)
-testing_accuracy = nn.acc(ytest, test_pred)
+# CHECKING ACCURACY OF CLASSIFICATION
+
+training_accuracy = nn.acc(ytrain, train_prediction)
+testing_accuracy = nn.acc(ytest, test_prediction)
 
 print(f'The training accuracy is: {training_accuracy}')
 print(f'The testing accuracy is: {testing_accuracy}')
