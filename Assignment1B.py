@@ -6,15 +6,25 @@ class preprocessing:
     def __init__(self, filepath):
         self.df = self.reader(filepath)
         self.cleaning()
-        # print(self.df.head())
+
+    def __repr__(self):
+        return self.df
 
     @staticmethod
     def reader(filepath):
+        """
+        reads a csv file
+        :param filepath: path to the file
+        :return: only reads the columns we want
+        """
         input_vars = ['income', 'social_fear', 'improve_yourself_how', 'friends', 'depressed']
         return pd.DataFrame(pd.read_csv(filepath, delimiter=",", usecols=input_vars))
 
     def cleaning(self):
-        # for "improve yourself how" we can use a "," as a delimiter
+        """
+        Clenas the improve_yourself_how column. it counts the commas in an answer
+        :return: the number of self-improvements of a person (none, 1, 2+)
+        """
         for answer in self.df['improve_yourself_how']:
             occurrence = answer.count(',')
 
@@ -31,9 +41,6 @@ class preprocessing:
             self.df['improve_yourself_how'] = self.df['improve_yourself_how'].replace(to_replace=answer,
                                                                                       value=int(occurrence))
         self.df.rename(columns={'improve_yourself_how': 'number_of_self_improvements'}, inplace=True)
-
-        for i in self.df['number_of_self_improvements']:
-            print(i)
 
 
 path = 'data/forever_alone.csv'
