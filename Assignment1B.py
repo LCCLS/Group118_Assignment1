@@ -1,5 +1,5 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score, KFold
 from sklearn.preprocessing import StandardScaler
 import numpy as np
 import matplotlib.pyplot as plt
@@ -224,18 +224,24 @@ preprocessed_file.cleaning_income()
 # print(preprocessed_file.df.dtypes)
 
 
-# SPLITTING DATAFRAME INTO TRAINING AND TESTING SETS
+# FORMATTING DF INTO X AND Y VALUES AND STANDARDIZING THEM
 
 X = preprocessed_file.df.drop(columns=['depressed'])
-y_label = preprocessed_file.df['depressed'].values.reshape(X.shape[0], 1)
-Xtrain, Xtest, ytrain, ytest = train_test_split(X, y_label, test_size=0.2, random_state=2)
+y = preprocessed_file.df['depressed'].values.reshape(X.shape[0], 1)
+
+sc = StandardScaler()
+sc.fit(X)
+X = sc.transform(X)
+
+# NORMAL TRAIN, TESTING DATA SPLIT:
+# Xtrain, Xtest, ytrain, ytest = train_test_split(X, y, test_size=0.2, random_state=2)
 
 # STANDARDIZING THE INPUT SETS
 
-sc = StandardScaler()
-sc.fit(Xtrain)
-Xtrain = sc.transform(Xtrain)
-Xtest = sc.transform(Xtest)
+# sc = StandardScaler()
+# sc.fit(Xtrain)
+# Xtrain = sc.transform(Xtrain)
+# Xtest = sc.transform(Xtest)
 
 # CHECKING SHAPES OF THE SETS
 
@@ -246,17 +252,40 @@ Xtest = sc.transform(Xtest)
 
 # TRAINING THE NEURAL NET
 
-nn = NeuralNet(layers=[4, 2, 1], learning_rate=0.01, iterations=500)
-nn.fit(Xtrain, ytrain)
-#nn.plot_loss()
+# nn = NeuralNet(layers=[4, 2, 1], learning_rate=0.01, iterations=500)
+# nn.fit(Xtrain, ytrain)
+# # nn.plot_loss()
+# train_prediction = nn.predict(Xtrain)
+# test_prediction = nn.predict(Xtest)
+#
+# # CHECKING ACCURACY OF CLASSIFICATION
+#
+# training_accuracy = nn.acc(ytrain, train_prediction)
+# testing_accuracy = nn.acc(ytest, test_prediction)
+# print(f'The training accuracy is: {training_accuracy}')
+# print(f'The testing accuracy is: {testing_accuracy}')
 
-train_prediction = nn.predict(Xtrain)
-test_prediction = nn.predict(Xtest)
 
-# CHECKING ACCURACY OF CLASSIFICATION
+# CROSS VALIDATION
+# could be a mistake in the indexing which i will look at later
 
-training_accuracy = nn.acc(ytrain, train_prediction)
-testing_accuracy = nn.acc(ytest, test_prediction)
+k = 10
+kf = KFold(n_splits=k, random_state=None)
+model = NeuralNet(layers=[4, 2, 1], learning_rate=0.01, iterations=500)
 
-print(f'The training accuracy is: {training_accuracy}')
-print(f'The testing accuracy is: {testing_accuracy}')
+acc_score = []
+
+for train_index, test_index in kf.split(X):
+    X_train, X_test = X[train_index, :], X[test_index, :]
+    y_train, y_test = y[train_index], y[test_index]
+
+    model.fit(X_train, y_train)
+    pred_values = model.predict(X_test)
+
+    acc = model.acc(pred_values, y_test)
+    acc_score.append(acc)
+
+avg_acc_score = sum(acc_score) / k
+
+print('Accuracy of each fold - {}'.format(acc_score))
+print('Avg accuracy of the NeuralNet: {}'.format(avg_acc_score))
