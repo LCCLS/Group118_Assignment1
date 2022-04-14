@@ -212,7 +212,7 @@ Xtest = sc.transform(Xtest)
 
 # TRAINING THE NEURAL NET
 
-nn = NeuralNet()
+nn = NeuralNet(layers=[4,2,1], learning_rate=0.01, iterations=500)
 nn.fit(Xtrain, ytrain)
 # nn.plot_loss()
 
