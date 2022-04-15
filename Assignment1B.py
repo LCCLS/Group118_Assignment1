@@ -106,40 +106,16 @@ preprocessed_file.cleaning_income()
 # print(preprocessed_file.df.isna().sum())
 # print(preprocessed_file.df.dtypes)
 
-
-# FORMATTING DF INTO X AND Y VALUES AND STANDARDIZING THEM
+# FORMATTING DF INTO X AND Y VALUES
 
 X = preprocessed_file.df.drop(columns=['depressed'])
 y = preprocessed_file.df['depressed'].values.reshape(X.shape[0], 1)
-print(type(X))
+
+# STANDARDIZING THE VALUES FOR THE NN
 
 sc = StandardScaler()
 sc.fit(X)
 X = sc.transform(X)
-print(type(X))
-
-# CHECKING SHAPES OF THE SETS
-
-# print(f"Shape of train set is {Xtrain.shape}")
-# print(f"Shape of test set is {Xtest.shape}")
-# print(f"Shape of train label is {ytrain.shape}")
-# print(f"Shape of test labels is {ytest.shape}")
-
-# TRAINING THE NEURAL NET
-
-# nn = NeuralNet(layers=[4, 2, 1], learning_rate=0.01, iterations=500)
-# nn.fit(Xtrain, ytrain)
-# # nn.plot_loss()
-# train_prediction = nn.predict(Xtrain)
-# test_prediction = nn.predict(Xtest)
-#
-# # CHECKING ACCURACY OF CLASSIFICATION
-#
-# training_accuracy = nn.acc(ytrain, train_prediction)
-# testing_accuracy = nn.acc(ytest, test_prediction)
-# print(f'The training accuracy is: {training_accuracy}')
-# print(f'The testing accuracy is: {testing_accuracy}')
-
 
 # CROSS VALIDATION
 
