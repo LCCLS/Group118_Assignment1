@@ -1,5 +1,5 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split, cross_val_score, KFold
+from sklearn.model_selection import train_test_split, KFold
 from sklearn.preprocessing import StandardScaler
 import numpy as np
 import matplotlib.pyplot as plt
@@ -69,6 +69,9 @@ class PreProcessing:
 
 
 class NeuralNet:
+    """
+    3 layered NN
+    """
 
     def __init__(self, layers=[4, 2, 1], learning_rate=0.001, iterations=100):
         self.params = {}
