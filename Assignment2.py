@@ -70,9 +70,8 @@ X_test = Titanic_testing.df_return()
 
 sc = StandardScaler()
 sc.fit(X_train)
-Xtrain = sc.transform(X_train)
-Xtest = sc.transform(X_test)
-print(Xtrain.isna().sum())
+X_train = sc.transform(X_train)
+X_test = sc.transform(X_test)
 
 # CHECKING SHAPES OF THE SETS
 
@@ -84,7 +83,7 @@ print(Xtrain.isna().sum())
 
 nn = NeuralNet(layers=[8, 4, 1], learning_rate=0.01, iterations=500)
 nn.fit(X_train, y_train)
-train_prediction = nn.predict(Xtrain)
+train_prediction = nn.predict(X_train)
 
 # CHECKING ACCURACY OF CLASSIFICATION
 
@@ -93,6 +92,6 @@ print(f'The training accuracy is: {training_accuracy}')
 
 # MAKING THE PREDICTION OF THE SURVIVAL OF TITANIC PASSENGERS
 
-test_prediction = nn.predict(Xtest)
+test_prediction = nn.predict(X_test)
 
 
