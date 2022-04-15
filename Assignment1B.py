@@ -67,6 +67,31 @@ class PreProcessing:
                 self.df['income'] = self.df['income'].replace(to_replace=i, value=float(200000))
 
 
+def cross_validation(k, model):
+    kf = KFold(n_splits=k, random_state=None)
+    acc_score = []
+    sc = StandardScaler()
+
+    for train_index, test_index in kf.split(X):
+        X_train, X_test = X[train_index, :], X[test_index, :]
+        y_train, y_test = y[train_index], y[test_index]
+
+        sc.fit(X_train)
+        X_train = sc.transform(X_train)
+        X_test = sc.transform(X_test)
+
+        model.fit(X_train, y_train)
+        pred_values = model.predict(X_test)
+
+        acc = model.acc(pred_values, y_test)
+        acc_score.append(acc)
+
+    avg_acc_score = sum(acc_score) / k
+
+    print('Accuracy of each fold - {}'.format(acc_score))
+    print('Avg accuracy of the NeuralNet: {}'.format(avg_acc_score))
+
+
 path = 'data/forever_alone.csv'
 preprocessed_file = PreProcessing(path)
 preprocessed_file.cleaning_improvement()
@@ -86,21 +111,12 @@ preprocessed_file.cleaning_income()
 
 X = preprocessed_file.df.drop(columns=['depressed'])
 y = preprocessed_file.df['depressed'].values.reshape(X.shape[0], 1)
+print(type(X))
 
 sc = StandardScaler()
 sc.fit(X)
 X = sc.transform(X)
-
-
-# NORMAL TRAIN, TESTING DATA SPLIT:
-# Xtrain, Xtest, ytrain, ytest = train_test_split(X, y, test_size=0.2, random_state=2)
-
-# STANDARDIZING THE INPUT SETS
-
-# sc = StandardScaler()
-# sc.fit(Xtrain)
-# Xtrain = sc.transform(Xtrain)
-# Xtest = sc.transform(Xtest)
+print(type(X))
 
 # CHECKING SHAPES OF THE SETS
 
@@ -126,26 +142,5 @@ X = sc.transform(X)
 
 
 # CROSS VALIDATION
-# could be a mistake in the indexing which i will look at later
-
-def cross_validation(k, model):
-    kf = KFold(n_splits=k, random_state=None)
-    acc_score = []
-
-    for train_index, test_index in kf.split(X):
-        X_train, X_test = X[train_index, :], X[test_index, :]
-        y_train, y_test = y[train_index], y[test_index]
-
-        model.fit(X_train, y_train)
-        pred_values = model.predict(X_test)
-
-        acc = model.acc(pred_values, y_test)
-        acc_score.append(acc)
-
-    avg_acc_score = sum(acc_score) / k
-
-    print('Accuracy of each fold - {}'.format(acc_score))
-    print('Avg accuracy of the NeuralNet: {}'.format(avg_acc_score))
-
 
 cross_validation(k=10, model=NeuralNet(layers=[4, 2, 1], learning_rate=0.01, iterations=500))
