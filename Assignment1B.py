@@ -21,29 +21,17 @@ class PreProcessing:
 
     def cleaning_improvement(self):
         """
-        Clenas the improve_yourself_how column. it counts the commas in an answer
+        Clean the improve_yourself_how column. it counts the commas in an answer
         :return: the number of self-improvements of a person (none, 1, 2+)
         """
-        for answer in self.df['improve_yourself_how']:
-            occurrence = answer.count(',')
+        self.df['improve_yourself_how'] = self.df['improve_yourself_how'].apply(lambda x: x.split(','))
+        self.df['improve_yourself_how'] = self.df['improve_yourself_how'].apply(lambda x: len(x))
 
-            if occurrence == 1:
-                self.df['improve_yourself_how'] = self.df['improve_yourself_how'].replace(to_replace=answer,
-                                                                                          value=int(1))
-            elif occurrence >= 2:
-                self.df['improve_yourself_how'] = self.df['improve_yourself_how'].replace(to_replace=answer,
-                                                                                          value=int(2))
-            else:
-                self.df['improve_yourself_how'] = self.df['improve_yourself_how'].replace(to_replace=answer,
-                                                                                          value=int(0))
-
-            self.df['improve_yourself_how'] = self.df['improve_yourself_how'].replace(to_replace=answer,
-                                                                                      value=int(occurrence))
         self.df.rename(columns={'improve_yourself_how': 'number_of_self_improvements'}, inplace=True)
 
     def cleaning_yes_no(self, column_name):
         """
-        cleans the column by converting categrocial data into binary
+        cleans the column by converting categorical data into binary
         :param column_name: the column that should be processed
         :return: binary values in the column and updates the df
         """
