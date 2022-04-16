@@ -1,4 +1,5 @@
 import pandas as pd
+import re
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler
 from NeuralNetwork import NeuralNet
@@ -47,12 +48,18 @@ class PreProcessing:
         takes the income as a string
         :return: return the max. income as an integer
         """
+        max_incomes = []
+
         for i in self.df['income']:
-            digits = ''.join(filter(lambda i: i.isdigit(), i[-7:]))
-            if len(digits) != 0:
-                self.df['income'] = self.df['income'].replace(to_replace=i, value=float(digits))
+            income = re.findall(r'\$\d+(?:\,\d+)?', i)
+            income = [int(x.replace('$', '').replace(',', '')) for x in income]
+
+            if len(income) == 2:
+                max_incomes.append(income[1])
             else:
-                self.df['income'] = self.df['income'].replace(to_replace=i, value=float(200000))
+                max_incomes.append(income[0])
+
+        self.df['incomes'] = max_incomes
 
 
 def cross_validation(k, model):
