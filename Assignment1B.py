@@ -59,7 +59,7 @@ class PreProcessing:
             else:
                 max_incomes.append(income[0])
 
-        self.df['incomes'] = max_incomes
+        self.df['income'] = max_incomes
 
 
 def cross_validation(k, model):
