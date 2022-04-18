@@ -2,7 +2,9 @@ import pandas as pd
 import re
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
 from NeuralNetwork import NeuralNet
+from RegressionClassifier import Regression
 
 
 class PreProcessing:
@@ -62,7 +64,7 @@ class PreProcessing:
         self.df['income'] = max_incomes
 
 
-def cross_validation(k, model):
+def cross_validation(k, model, modelname):
     kf = KFold(n_splits=k, random_state=None)
     acc_score = []
     sc = StandardScaler()
@@ -81,10 +83,11 @@ def cross_validation(k, model):
         acc = model.acc(pred_values, y_test)
         acc_score.append(acc)
 
+
     avg_acc_score = sum(acc_score) / k
 
     print('Accuracy of each fold - {}'.format(acc_score))
-    print('Avg accuracy of the NeuralNet: {}'.format(avg_acc_score))
+    print('Avg accuracy of the {}: {}'.format(modelname, avg_acc_score))
 
 
 path = 'data/forever_alone.csv'
@@ -112,6 +115,10 @@ sc = StandardScaler()
 sc.fit(X)
 X = sc.transform(X)
 
-# CROSS VALIDATION
+# LOGISTIC   REGRESSION
 
-cross_validation(k=10, model=NeuralNet(layers=[4, 2, 1], learning_rate=0.01, iterations=500))
+cross_validation(10, Regression(LogisticRegression()), 'Logistic Regression')
+
+# NEURAL NETWORK
+
+cross_validation(10, NeuralNet(layers=[4, 2, 1], learning_rate=0.01, iterations=500), 'Logistic Regression')
