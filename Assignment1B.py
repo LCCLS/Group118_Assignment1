@@ -1,7 +1,10 @@
 import pandas as pd
+import re
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
 from NeuralNetwork import NeuralNet
+from RegressionClassifier import Regression
 
 
 class PreProcessing:
@@ -21,29 +24,17 @@ class PreProcessing:
 
     def cleaning_improvement(self):
         """
-        Clenas the improve_yourself_how column. it counts the commas in an answer
+        Clean the improve_yourself_how column. it counts the commas in an answer
         :return: the number of self-improvements of a person (none, 1, 2+)
         """
-        for answer in self.df['improve_yourself_how']:
-            occurrence = answer.count(',')
+        self.df['improve_yourself_how'] = self.df['improve_yourself_how'].apply(lambda x: x.split(','))
+        self.df['improve_yourself_how'] = self.df['improve_yourself_how'].apply(lambda x: len(x))
 
-            if occurrence == 1:
-                self.df['improve_yourself_how'] = self.df['improve_yourself_how'].replace(to_replace=answer,
-                                                                                          value=int(1))
-            elif occurrence >= 2:
-                self.df['improve_yourself_how'] = self.df['improve_yourself_how'].replace(to_replace=answer,
-                                                                                          value=int(2))
-            else:
-                self.df['improve_yourself_how'] = self.df['improve_yourself_how'].replace(to_replace=answer,
-                                                                                          value=int(0))
-
-            self.df['improve_yourself_how'] = self.df['improve_yourself_how'].replace(to_replace=answer,
-                                                                                      value=int(occurrence))
         self.df.rename(columns={'improve_yourself_how': 'number_of_self_improvements'}, inplace=True)
 
     def cleaning_yes_no(self, column_name):
         """
-        cleans the column by converting categrocial data into binary
+        cleans the column by converting categorical data into binary
         :param column_name: the column that should be processed
         :return: binary values in the column and updates the df
         """
@@ -59,15 +50,21 @@ class PreProcessing:
         takes the income as a string
         :return: return the max. income as an integer
         """
+        max_incomes = []
+
         for i in self.df['income']:
-            digits = ''.join(filter(lambda i: i.isdigit(), i[-7:]))
-            if len(digits) != 0:
-                self.df['income'] = self.df['income'].replace(to_replace=i, value=float(digits))
+            income = re.findall(r'\$\d+(?:\,\d+)?', i)
+            income = [int(x.replace('$', '').replace(',', '')) for x in income]
+
+            if len(income) == 2:
+                max_incomes.append(income[1])
             else:
-                self.df['income'] = self.df['income'].replace(to_replace=i, value=float(200000))
+                max_incomes.append(income[0])
+
+        self.df['income'] = max_incomes
 
 
-def cross_validation(k, model):
+def cross_validation(k, model, modelname):
     kf = KFold(n_splits=k, random_state=None)
     acc_score = []
     sc = StandardScaler()
@@ -86,10 +83,11 @@ def cross_validation(k, model):
         acc = model.acc(pred_values, y_test)
         acc_score.append(acc)
 
+
     avg_acc_score = sum(acc_score) / k
 
     print('Accuracy of each fold - {}'.format(acc_score))
-    print('Avg accuracy of the NeuralNet: {}'.format(avg_acc_score))
+    print('Avg accuracy of the {}: {}'.format(modelname, avg_acc_score))
 
 
 path = 'data/forever_alone.csv'
@@ -117,6 +115,10 @@ sc = StandardScaler()
 sc.fit(X)
 X = sc.transform(X)
 
-# CROSS VALIDATION
+# LOGISTIC   REGRESSION
 
-cross_validation(k=10, model=NeuralNet(layers=[4, 2, 1], learning_rate=0.01, iterations=500))
+cross_validation(10, Regression(LogisticRegression()), 'Logistic Regression')
+
+# NEURAL NETWORK
+
+cross_validation(10, NeuralNet(layers=[4, 2, 1], learning_rate=0.01, iterations=500), 'Logistic Regression')
