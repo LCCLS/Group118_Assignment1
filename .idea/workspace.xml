@@ -6,16 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="17744744-56e7-4a2f-8f01-16228bbad53f" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assignment1B.py" beforeDir="false" afterPath="$PROJECT_DIR$/Assignment1B.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assignment2.py" beforeDir="false" afterPath="$PROJECT_DIR$/Assignment2.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RegressionClassifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/RegressionClassifier.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/figures/titanic/Age.png" beforeDir="false" afterPath="$PROJECT_DIR$/figures/titanic/Age.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/figures/titanic/Embarked.png" beforeDir="false" afterPath="$PROJECT_DIR$/figures/titanic/Embarked.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/figures/titanic/Fare.png" beforeDir="false" afterPath="$PROJECT_DIR$/figures/titanic/Fare.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/figures/titanic/Parch.png" beforeDir="false" afterPath="$PROJECT_DIR$/figures/titanic/Parch.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/figures/titanic/Pclass.png" beforeDir="false" afterPath="$PROJECT_DIR$/figures/titanic/Pclass.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/figures/titanic/Sex.png" beforeDir="false" afterPath="$PROJECT_DIR$/figures/titanic/Sex.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/figures/titanic/SibSp.png" beforeDir="false" afterPath="$PROJECT_DIR$/figures/titanic/SibSp.png" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

@@ -51,7 +51,7 @@ class TitanicPreProcessing:
             self.df[col] = label_encoder.transform(self.df[col])
 
     def nan_replacement(self):
-        columns = {'Age': str(30), 'Embarked': str('S'), 'Fare': str(35)}
+        columns = {'Age': str(30), 'Embarked': str('S'), 'Fare': str(14.5)}
         for col in columns.keys():
             self.df[col].fillna(columns[col], inplace=True)
 
