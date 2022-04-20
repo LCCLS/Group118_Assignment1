@@ -17,7 +17,9 @@ class Regression:
         :param X_test: Test variables used to predict the response variable
         :return: A 1D array that contains the predicted variables
         """
-        return self.reg.predict(X_test)
+        predictions = self.reg.predict(X_test).tolist()
+        predictions = [[prediction] for prediction in predictions]
+        return predictions
 
     def acc(self, predicted, y_test):
         """
@@ -27,6 +29,7 @@ class Regression:
         :return: Accuracy of the model in percentage
         """
         flat_y_test = [label for instance in list(y_test) for label in instance]
+        flat_predicted = [prediction for predictions in list(predicted) for prediction in predictions]
         total_correct = 0
         for pred, y in zip(list(predicted), flat_y_test):
             if pred == y:

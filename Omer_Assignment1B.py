@@ -85,18 +85,19 @@ def cross_validation(k, model, modelname):
         acc = model.acc(pred_values, y_test)
         acc_score.append(acc)
 
+        mse = mean_squared_error(y_test, pred_values)
+        mae = mean_absolute_error(y_test, pred_values)
+
+        print(f"Mean Squared Error of {modelname}: {mse}")
+        print(f"Mean Absolute Error {modelname}: {mae}")
 
     avg_acc_score = sum(acc_score) / k
-    mse = mean_squared_error(y_test, pred_values)
-    mae = mean_absolute_error(y_test, pred_values)
 
     print('Accuracy of each fold - {}'.format(acc_score))
     print('Avg accuracy of the {}: {}'.format(modelname, avg_acc_score))
-    print(f"Mean Squared Error of {modelname}: {mse}")
-    print(f"Mean Absolute Error {modelname}: {mae}")
 
 
-path = '/Users/omerkirmaz/Documents/VRIJE/Master/Year_1/P5/DMT/As1/Group118_Assignment1/data/forever_alone.csv'
+path = 'data/forever_alone.csv'
 preprocessed_file = PreProcessing(path)
 preprocessed_file.cleaning_improvement()
 preprocessed_file.cleaning_yes_no('depressed')
