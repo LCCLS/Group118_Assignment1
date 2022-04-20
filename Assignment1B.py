@@ -6,7 +6,7 @@ from sklearn.linear_model import LogisticRegression
 from NeuralNetwork import NeuralNet
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_absolute_error
-from RegressionClassifier import Regression
+from RegressionClassifier import Classification
 
 
 class PreProcessing:
@@ -97,7 +97,7 @@ def cross_validation(k, model, modelname):
     print('Accuracy of each fold - {}'.format(acc_score))
     print('Avg accuracy of the {}: {}'.format(modelname, avg_acc_score))
     print('Average Mean Squared Error of {}: {}'.format(modelname, avg_mse))
-    print('Average Mean Absolute Error of {}: {}'.format(modelname, avg_mae))
+    print('Average Mean Absolute Error of {}: {} \n'.format(modelname, avg_mae))
 
 
 path = 'data/forever_alone.csv'
@@ -127,7 +127,7 @@ X = sc.transform(X)
 
 # LOGISTIC   REGRESSION
 
-cross_validation(10, Regression(LogisticRegression()), 'Logistic Regression')
+cross_validation(10, Classification(LogisticRegression()), 'Logistic Regression')
 
 # NEURAL NETWORK
 

@@ -3,6 +3,10 @@ import plotly.express as px
 from sklearn import preprocessing
 from sklearn.preprocessing import StandardScaler
 from NeuralNetwork import NeuralNet
+from RegressionClassifier import Classification
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.linear_model import LogisticRegression
+import numpy as np
 
 
 class TitanicPreProcessing:
@@ -30,7 +34,7 @@ class TitanicPreProcessing:
             self.eda_categorical_plotting()
 
     def eda_categorical_plotting(self):
-        columns = ["Pclass", "Sex", "SibSp", "Parch", 'Embarked', 'Age', 'Fare', ]
+        columns = ["Pclass", "Sex", "SibSp", "Parch", 'Embarked', 'Age', 'Fare']
 
         for col in columns:
             fig = px.histogram(self.df, x=col, y='Survived', title=col)
@@ -47,7 +51,7 @@ class TitanicPreProcessing:
             self.df[col] = label_encoder.transform(self.df[col])
 
     def nan_replacement(self):
-        columns = {'Age': str(30), 'Embarked': str('S')}
+        columns = {'Age': str(30), 'Embarked': str('S'), 'Fare': str(35)}
         for col in columns.keys():
             self.df[col].fillna(columns[col], inplace=True)
 
@@ -83,15 +87,41 @@ X_test = sc.transform(X_test)
 
 nn = NeuralNet(layers=[8, 4, 1], learning_rate=0.01, iterations=500)
 nn.fit(X_train, y_train)
-train_prediction = nn.predict(X_train)
+nn_train_prediction = nn.predict(X_train)
 
 # CHECKING ACCURACY OF CLASSIFICATION
 
-training_accuracy = nn.acc(y_train, train_prediction)
-print(f'The training accuracy is: {training_accuracy}')
+nn_training_accuracy = nn.acc(y_train, nn_train_prediction)
+print(f'The training accuracy of the neural network is: {nn_training_accuracy}')
 
 # MAKING THE PREDICTION OF THE SURVIVAL OF TITANIC PASSENGERS
 
-test_prediction = nn.predict(X_test)
+nn_test_prediction = nn.predict(X_test)
 
 
+# CLASSIFY WITH KNN
+knn = Classification(KNeighborsClassifier())
+knn.fit(X_train, y_train)
+knn_train_prediction = knn.predict(X_train)
+
+# CHECKING ACCURACY OF CLASSIFICATION
+
+knn_training_accuracy = knn.acc(y_train, knn_train_prediction)
+print(f'The training accuracy of the K-nearest neighbours is: {knn_training_accuracy}')
+
+# MAKING THE PREDICTION OF THE SURVIVAL OF TITANIC PASSENGERS
+
+test_prediction = knn.predict(X_test)
+
+
+# CLASSIFY WITH LOGISTIC REGRESSION
+regression = Classification(LogisticRegression())
+regression.fit(X_train, y_train)
+regression_train_prediction = regression.predict(X_train)
+
+# CHECKING ACCURACY OF CLASSIFICATION
+
+regression_training_accuracy = regression.acc(y_train, regression_train_prediction)
+print(f'The training accuracy of the Logistic Regression is: {regression_training_accuracy}')
+
+regression_test_prediction = regression.predict(X_test)

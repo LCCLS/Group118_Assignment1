@@ -1,4 +1,4 @@
-class Regression:
+class Classification:
 
     def __init__(self, model):
         self.reg = model
@@ -30,8 +30,9 @@ class Regression:
         """
         flat_y_test = [label for instance in list(y_test) for label in instance]
         flat_predicted = [prediction for predictions in list(predicted) for prediction in predictions]
+
         total_correct = 0
-        for pred, y in zip(list(predicted), flat_y_test):
+        for pred, y in zip(flat_predicted, flat_y_test):
             if pred == y:
                 total_correct += 1
         return (total_correct / len(flat_y_test)) * 100
