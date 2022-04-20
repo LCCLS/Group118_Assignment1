@@ -4,6 +4,8 @@ from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from NeuralNetwork import NeuralNet
+from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_absolute_error
 from RegressionClassifier import Regression
 
 
@@ -67,6 +69,8 @@ class PreProcessing:
 def cross_validation(k, model, modelname):
     kf = KFold(n_splits=k, random_state=None)
     acc_score = []
+    mse = []
+    mae = []
     sc = StandardScaler()
 
     for train_index, test_index in kf.split(X):
@@ -83,11 +87,17 @@ def cross_validation(k, model, modelname):
         acc = model.acc(pred_values, y_test)
         acc_score.append(acc)
 
+        mse.append(mean_squared_error(y_test, pred_values))
+        mae.append(mean_absolute_error(y_test, pred_values))
 
-    avg_acc_score = sum(acc_score) / k
+    avg_acc_score = sum(acc_score) / len(acc_score)
+    avg_mse = sum(mse) / len(mse)
+    avg_mae = sum(mae) / len(mae)
 
     print('Accuracy of each fold - {}'.format(acc_score))
     print('Avg accuracy of the {}: {}'.format(modelname, avg_acc_score))
+    print('Average Mean Squared Error of {}: {}'.format(modelname, avg_mse))
+    print('Average Mean Absolute Error of {}: {}'.format(modelname, avg_mae))
 
 
 path = 'data/forever_alone.csv'
