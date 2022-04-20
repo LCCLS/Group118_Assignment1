@@ -121,4 +121,4 @@ cross_validation(10, Regression(LogisticRegression()), 'Logistic Regression')
 
 # NEURAL NETWORK
 
-cross_validation(10, NeuralNet(layers=[4, 2, 1], learning_rate=0.01, iterations=500), 'Logistic Regression')
+cross_validation(10, NeuralNet(layers=[4, 2, 1], learning_rate=0.01, iterations=500), 'Neural Network')
