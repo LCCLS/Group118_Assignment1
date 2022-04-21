@@ -142,14 +142,13 @@ sc = StandardScaler()
 sc.fit(X)
 X = sc.transform(X)
 
-# LOGISTIC   REGRESSION
+# LOGISTIC REGRESSION
 
 acc_log, mse_log, mae_log = cross_validation(10, Classification(LogisticRegression()), 'Logistic Regression', X, y, True)
 
-#NEURAL NETWORK
+# NEURAL NETWORK
 
 acc_nn, mse_nn, mae_nn = cross_validation(10, NeuralNet(layers=[4, 2, 1], learning_rate=0.01, iterations=500), 'Neural Network', X, y, True)
-
 
 # PREDICT FRIENDS WITH DIFFERENT REGRESSION METHODS
 
@@ -157,7 +156,6 @@ acc_nn, mse_nn, mae_nn = cross_validation(10, NeuralNet(layers=[4, 2, 1], learni
 
 X_friends = preprocessed_file.df.drop(columns=['friends'])
 y_friends = preprocessed_file.df['friends'].values.reshape(X_friends.shape[0], 1)
-print(len(y_friends))
 
 # STANDARDIZING THE VALUES FOR THE NN
 
@@ -167,34 +165,32 @@ X_friends = sc.transform(X_friends)
 
 # LINEAR REGRESSION
 
-# mse_lin_reg, mae_lin_reg = cross_validation(10, Classification(LinearRegression()), 'Linear Regression', X_friends, y_friends, False)
+mse_lin_reg, mae_lin_reg = cross_validation(10, Classification(LinearRegression()), 'Linear Regression', X_friends, y_friends, False)
 
 # # BAYESIAN RIDGE REGRESSION
 
-# mse_bay, mae_bay = cross_validation(10, Classification(BayesianRidge(compute_score=True)), 'Bayesian Ridge', X_friends, y_friends, False)
+mse_bay, mae_bay = cross_validation(10, Classification(BayesianRidge(compute_score=True)), 'Bayesian Ridge', X_friends, y_friends, False)
 
 # # DECISION TREE
 
-# mse_tree, mae_tree = cross_validation(10, Classification(DecisionTreeRegressor()), 'Decision Tree', X_friends, y_friends, False)
+mse_tree, mae_tree = cross_validation(10, Classification(DecisionTreeRegressor()), 'Decision Tree', X_friends, y_friends, False)
 
+# Two-sample t-test for accuracy, mse and mae of linear regression and NN
 
-# print(f"acc: {scipy.stats.ttest_ind(acc_log,acc_nn)[1]}")
-# print(f"mae: {scipy.stats.ttest_ind(mse_log,mse_nn)[1]}")
-# print(f"mse: {scipy.stats.ttest_ind(mae_log,mse_nn)[1]}")
+print(f"acc: {scipy.stats.ttest_ind(acc_log,acc_nn)[1]}")
+print(f"mae: {scipy.stats.ttest_ind(mse_log,mse_nn)[1]}")
+print(f"mse: {scipy.stats.ttest_ind(mae_log,mse_nn)[1]}")
 
+# Wilcoxon signed-rank test for accuracy, mse and mse of linear regression and NN
 print(f"acc: {scipy.stats.wilcoxon(acc_log,acc_nn)[1]}")
 print(f"mae: {scipy.stats.wilcoxon(mse_log,mse_nn)[1]}")
 print(f"mse: {scipy.stats.wilcoxon(mae_log,mse_nn)[1]}")
 
-
-
-
-
 # Kruskal Wallis and ANOVA for regression method errors
-# print(scipy.stats.f_oneway(mse_lin_reg, mse_bay, mse_tree)[1])
-# # print(scipy.stats.f_oneway(mae_lin_reg, mae_bay, mae_tree)[1])
+print(scipy.stats.f_oneway(mse_lin_reg, mse_bay, mse_tree)[1])
+print(scipy.stats.f_oneway(mae_lin_reg, mae_bay, mae_tree)[1])
 
-# # print(scipy.stats.kruskal(mse_lin_reg, mse_bay, mse_tree)[1])
-# # print(scipy.stats.kruskal(mae_lin_reg, mae_bay, mae_tree)[1])
+print(scipy.stats.kruskal(mse_lin_reg, mse_bay, mse_tree)[1])
+print(scipy.stats.kruskal(mae_lin_reg, mae_bay, mae_tree)[1])
 
                  
