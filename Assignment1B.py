@@ -3,6 +3,8 @@ import re
 from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeRegressor
 from NeuralNetwork import NeuralNet
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_absolute_error
@@ -66,7 +68,7 @@ class PreProcessing:
         self.df['income'] = max_incomes
 
 
-def cross_validation(k, model, modelname):
+def cross_validation(k, model, modelname, X, y, binary_classification):
     kf = KFold(n_splits=k, random_state=None)
     acc_score = []
     mse = []
@@ -84,19 +86,24 @@ def cross_validation(k, model, modelname):
         model.fit(X_train, y_train)
         pred_values = model.predict(X_test)
 
-        acc = model.acc(pred_values, y_test)
-        acc_score.append(acc)
+        if binary_classification:
+            # Calculate accuracy of non-regression algorithms
+            acc = model.acc(pred_values, y_test)
+            acc_score.append(acc)
 
         mse.append(mean_squared_error(y_test, pred_values))
         mae.append(mean_absolute_error(y_test, pred_values))
 
-    avg_acc_score = sum(acc_score) / len(acc_score)
+    if binary_classification:
+        avg_acc_score = sum(acc_score) / len(acc_score)
+        print('Accuracy of each fold - {}'.format(acc_score))
+        print('Avg accuracy of the {}: {}'.format(modelname, avg_acc_score))
     avg_mse = sum(mse) / len(mse)
     avg_mae = sum(mae) / len(mae)
 
-    print('Accuracy of each fold - {}'.format(acc_score))
-    print('Avg accuracy of the {}: {}'.format(modelname, avg_acc_score))
+    print('Mean Squared Error of each fold - {}'.format(mse))
     print('Average Mean Squared Error of {}: {}'.format(modelname, avg_mse))
+    print('Mean Absolute Error of each fold - {}'.format(mae))
     print('Average Mean Absolute Error of {}: {} \n'.format(modelname, avg_mae))
 
 
@@ -127,8 +134,31 @@ X = sc.transform(X)
 
 # LOGISTIC   REGRESSION
 
-cross_validation(10, Classification(LogisticRegression()), 'Logistic Regression')
+cross_validation(10, Classification(LogisticRegression()), 'Logistic Regression', X, y, True)
 
 # NEURAL NETWORK
 
-cross_validation(10, NeuralNet(layers=[4, 2, 1], learning_rate=0.01, iterations=500), 'Neural Network')
+cross_validation(10, NeuralNet(layers=[4, 2, 1], learning_rate=0.01, iterations=500), 'Neural Network', X, y, True)
+
+
+# PREDICT FRIENDS WITH DIFFERENT REGRESSION METHODS
+
+# FORMATTING DF INTO X AND Y VALUES
+
+X_friends = preprocessed_file.df.drop(columns=['friends'])
+y_friends = preprocessed_file.df['friends'].values.reshape(X_friends.shape[0], 1)
+
+# STANDARDIZING THE VALUES FOR THE NN
+
+sc = StandardScaler()
+sc.fit(X_friends)
+X_friends = sc.transform(X_friends)
+
+# LINEAR REGRESSION
+
+cross_validation(10, Classification(LinearRegression()), 'Linear Regression', X_friends, y_friends, False)
+
+# DECISION TREE
+
+cross_validation(10, Classification(DecisionTreeRegressor()), 'Decision Tree', X_friends, y_friends, False)
+                 
