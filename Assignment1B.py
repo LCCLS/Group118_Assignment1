@@ -4,6 +4,7 @@ from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import BayesianRidge
 from sklearn.tree import DecisionTreeRegressor
 from NeuralNetwork import NeuralNet
 from sklearn.metrics import mean_squared_error
@@ -107,7 +108,7 @@ def cross_validation(k, model, modelname, X, y, binary_classification):
     print('Average Mean Absolute Error of {}: {} \n'.format(modelname, avg_mae))
 
 
-path = 'data/forever_alone.csv'
+path = '/Users/omerkirmaz/Documents/VRIJE/Master/Year_1/P5/DMT/As1/Group118_Assignment1/data/forever_alone.csv'
 preprocessed_file = PreProcessing(path)
 preprocessed_file.cleaning_improvement()
 preprocessed_file.cleaning_yes_no('depressed')
@@ -157,6 +158,10 @@ X_friends = sc.transform(X_friends)
 # LINEAR REGRESSION
 
 cross_validation(10, Classification(LinearRegression()), 'Linear Regression', X_friends, y_friends, False)
+
+# BAYESIAN RIDGE REGRESSION
+
+cross_validation(10, Classification(BayesianRidge(compute_score=True)), 'Bayesian Ridge', X_friends, y_friends, False)
 
 # DECISION TREE
 
