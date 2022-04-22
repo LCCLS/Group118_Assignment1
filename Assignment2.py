@@ -7,13 +7,14 @@ from RegressionClassifier import Classification
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 import numpy as np
+import csv
 
 
 class TitanicPreProcessing:
 
     def __init__(self, filename, plotting):
         self.df = pd.DataFrame(pd.read_csv(filename, delimiter=","))
-        #self.test_data = pd.DataFrame(pd.read_csv('data/titanic/test.csv', delimiter=","))
+        # self.test_data = pd.DataFrame(pd.read_csv('data/titanic/test.csv', delimiter=","))
 
         # print(self.train_data.head())
         # print(self.train_data.info())
@@ -64,6 +65,15 @@ class TitanicPreProcessing:
             return self.df
 
 
+def create_output_csv(filepath, survived: list):
+    df_id = pd.DataFrame(pd.read_csv('data/titanic/test.csv', delimiter=',', usecols=['PassengerId']))
+    survived_flat_list = [num for sublist in survived for num in sublist]
+    df_id['Survived'] = survived_flat_list
+    df_id.to_csv(filepath)
+    #with open(filepath, "w") as f:
+    #    writer = csv.writer(f)
+    #    writer.writerows(new_list)
+
 Titanic_training = TitanicPreProcessing(filename='data/titanic/train.csv', plotting=True)
 X_train, y_train = Titanic_training.df_return()
 
@@ -98,7 +108,6 @@ print(f'The training accuracy of the neural network is: {nn_training_accuracy}')
 
 nn_test_prediction = nn.predict(X_test)
 
-
 # CLASSIFY WITH KNN
 knn = Classification(KNeighborsClassifier())
 knn.fit(X_train, y_train)
@@ -113,7 +122,6 @@ print(f'The training accuracy of the K-nearest neighbours is: {knn_training_accu
 
 test_prediction = knn.predict(X_test)
 
-
 # CLASSIFY WITH LOGISTIC REGRESSION
 regression = Classification(LogisticRegression())
 regression.fit(X_train, y_train)
@@ -125,3 +133,6 @@ regression_training_accuracy = regression.acc(y_train, regression_train_predicti
 print(f'The training accuracy of the Logistic Regression is: {regression_training_accuracy}')
 
 regression_test_prediction = regression.predict(X_test)
+
+
+create_output_csv('data/titanic/test_prediction.csv', knn.predict(X_test))

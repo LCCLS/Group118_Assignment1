@@ -117,7 +117,7 @@ def cross_validation(k, model, modelname, X, y, binary_classification):
     #print('Predicted values for {}: {}'.format(modelname, pred_values))
 
 
-path = '/Users/omerkirmaz/Documents/VRIJE/Master/Year_1/P5/DMT/As1/Group118_Assignment1/data/forever_alone.csv'
+path = 'data/forever_alone.csv'
 preprocessed_file = PreProcessing(path)
 preprocessed_file.cleaning_improvement()
 preprocessed_file.cleaning_yes_no('depressed')
@@ -148,7 +148,7 @@ acc_log, mse_log, mae_log = cross_validation(10, Classification(LogisticRegressi
 
 #NEURAL NETWORK
 
-acc_nn, mse_nn, mae_nn = cross_validation(10, NeuralNet(layers=[4, 2, 1], learning_rate=0.01, iterations=500), 'Neural Network', X, y, True)
+acc_nn, mse_nn, mae_nn = cross_validation(10, NeuralNet(layers=[4, 2, 1], learning_rate=0.001, iterations=500), 'Neural Network', X, y, True)
 
 
 # PREDICT FRIENDS WITH DIFFERENT REGRESSION METHODS
