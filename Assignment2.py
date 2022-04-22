@@ -2,6 +2,7 @@ import pandas as pd
 import plotly.express as px
 from sklearn import preprocessing
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
 from NeuralNetwork import NeuralNet
 from RegressionClassifier import Classification
 from sklearn.neighbors import KNeighborsClassifier
@@ -59,13 +60,14 @@ class TitanicPreProcessing:
         if 'Survived' in self.df.columns:
             X = self.df.drop(columns=['Survived'])
             y = self.df['Survived'].values.reshape(X.shape[0], 1)
-            return X, y
+            X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.25, random_state=42)
+            return X_train, X_val, y_train, y_val
         else:
             return self.df
 
 
 Titanic_training = TitanicPreProcessing(filename='data/titanic/train.csv', plotting=True)
-X_train, y_train = Titanic_training.df_return()
+X_train, X_val, y_train, y_val = Titanic_training.df_return()
 
 Titanic_testing = TitanicPreProcessing(filename='data/titanic/test.csv', plotting=False)
 X_test = Titanic_testing.df_return()
@@ -76,6 +78,7 @@ sc = StandardScaler()
 sc.fit(X_train)
 X_train = sc.transform(X_train)
 X_test = sc.transform(X_test)
+X_val = sc.transform(X_val)
 
 # CHECKING SHAPES OF THE SETS
 
@@ -88,11 +91,14 @@ X_test = sc.transform(X_test)
 nn = NeuralNet(layers=[8, 4, 1], learning_rate=0.01, iterations=500)
 nn.fit(X_train, y_train)
 nn_train_prediction = nn.predict(X_train)
+nn_val_prediction = nn.predict(X_val)
 
 # CHECKING ACCURACY OF CLASSIFICATION
 
 nn_training_accuracy = nn.acc(y_train, nn_train_prediction)
+nn_val_accuracy = nn.acc(y_val, nn_val_prediction)
 print(f'The training accuracy of the neural network is: {nn_training_accuracy}')
+print(f'The validation accuracy of the neural network is: {nn_val_accuracy} \n')
 
 # MAKING THE PREDICTION OF THE SURVIVAL OF TITANIC PASSENGERS
 
@@ -103,25 +109,31 @@ nn_test_prediction = nn.predict(X_test)
 knn = Classification(KNeighborsClassifier())
 knn.fit(X_train, y_train)
 knn_train_prediction = knn.predict(X_train)
+knn_val_prediction = knn.predict(X_val)
 
 # CHECKING ACCURACY OF CLASSIFICATION
 
 knn_training_accuracy = knn.acc(y_train, knn_train_prediction)
+knn_val_accuracy = knn.acc(y_val, knn_val_prediction)
 print(f'The training accuracy of the K-nearest neighbours is: {knn_training_accuracy}')
-
-# MAKING THE PREDICTION OF THE SURVIVAL OF TITANIC PASSENGERS
-
-test_prediction = knn.predict(X_test)
-
+print(f'The validation accuracy of the K-nearest neighbours is: {knn_val_accuracy} \n')
 
 # CLASSIFY WITH LOGISTIC REGRESSION
 regression = Classification(LogisticRegression())
 regression.fit(X_train, y_train)
 regression_train_prediction = regression.predict(X_train)
+regression_val_prediction = regression.predict(X_val)
 
 # CHECKING ACCURACY OF CLASSIFICATION
 
 regression_training_accuracy = regression.acc(y_train, regression_train_prediction)
+regression_val_accuracy = regression.acc(y_val, regression_val_prediction)
 print(f'The training accuracy of the Logistic Regression is: {regression_training_accuracy}')
+print(f'The validation accuracy of the Logistic Regression is: {regression_val_accuracy} \n')
 
 regression_test_prediction = regression.predict(X_test)
+
+
+# MAKING THE PREDICTION OF THE SURVIVAL OF TITANIC PASSENGERS
+
+test_prediction = knn.predict(X_test)
