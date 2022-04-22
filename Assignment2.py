@@ -106,7 +106,7 @@ nn_test_prediction = nn.predict(X_test)
 
 
 # CLASSIFY WITH KNN
-knn = Classification(KNeighborsClassifier())
+knn = Classification(KNeighborsClassifier(n_neighbors=20))
 knn.fit(X_train, y_train)
 knn_train_prediction = knn.predict(X_train)
 knn_val_prediction = knn.predict(X_val)
