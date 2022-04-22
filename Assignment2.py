@@ -72,9 +72,7 @@ def create_output_csv(filepath, survived: list):
     survived_flat_list = [num for sublist in survived for num in sublist]
     df_id['Survived'] = survived_flat_list
     df_id.to_csv(filepath)
-    #with open(filepath, "w") as f:
-    #    writer = csv.writer(f)
-    #    writer.writerows(new_list)
+
 
 Titanic_training = TitanicPreProcessing(filename='data/titanic/train.csv', plotting=True)
 X_train, X_val, y_train, y_val = Titanic_training.df_return()
@@ -146,4 +144,3 @@ regression_test_prediction = regression.predict(X_test)
 
 knn_test_prediction = knn.predict(X_test)
 create_output_csv('data/titanic/test_prediction.csv', knn_test_prediction)
-
