@@ -96,9 +96,6 @@ def cross_validation(k, model, modelname, X, y, binary_classification):
         mse.append(mean_squared_error(y_test, pred_values))
         mae.append(mean_absolute_error(y_test, pred_values))
 
-        
-        
-
     if binary_classification:
         avg_acc_score = sum(acc_score) / len(acc_score)
         print('Accuracy of each fold - {}'.format(acc_score))

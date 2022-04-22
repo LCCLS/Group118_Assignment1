@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="17744744-56e7-4a2f-8f01-16228bbad53f" name="Changes" comment="" />
+    <list default="true" id="17744744-56e7-4a2f-8f01-16228bbad53f" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assignment2.py" beforeDir="false" afterPath="$PROJECT_DIR$/Assignment2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/NeuralNetwork.py" beforeDir="false" afterPath="$PROJECT_DIR$/NeuralNetwork.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -22,6 +26,7 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="exceleditor.install" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RecentsManager">
@@ -29,7 +34,7 @@
       <recent name="C:\Users\vries\Programming\DataMining\Assignment1" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.Assignment1B">
+  <component name="RunManager" selected="Python.Assignment2">
     <configuration name="Assignment1B" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Assignment1" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -95,8 +100,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.Assignment1B" />
         <item itemvalue="Python.Assignment2" />
+        <item itemvalue="Python.Assignment1B" />
         <item itemvalue="Python.Omer_Assignment1B" />
       </list>
     </recent_temporary>
